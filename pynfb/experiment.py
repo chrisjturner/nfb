@@ -641,7 +641,8 @@ class Experiment():
                     # Take into account any extra accumulated score due to holding
                     self.cum_score = self.reward.get_score()
                     logging.debug(
-                        f"!! END !! - SAMP: {self.samples_counter}, fBSCORE: {self.fb_score}, CUMSCORE: {self.cum_score}, SELF.REWARD: {self.reward.get_score()}")
+                        f"!! END !! - SAMP: {self.samples_counter}, fBSCORE: {self.fb_score}, CUMSCORE: {self.cum_score}, SELF.REWARD: {self.reward.get_score()},"
+                        f"TIMESTAMP: {self.timestamp_recorder[self.samples_counter]}, PROTOCOL_{self.current_protocol_index}-{self.protocols_sequence[self.current_protocol_index].name}")
                     self.el_tracker.sendMessage(f'PROTOCOL_{self.current_protocol_index}-{self.protocols_sequence[self.current_protocol_index].name}_END')
                     self.next_protocol()
 
@@ -681,6 +682,8 @@ class Experiment():
         Change protocol
         :return: None
         """
+        logging.debug(
+            f"NEXT PROTOCOL START TIMESTAMP: {self.timestamp_recorder[self.samples_counter]}, PROTOCOL_{self.current_protocol_index}-{self.protocols_sequence[self.current_protocol_index].name}")
         # save raw and signals samples asynchronously
         protocol_number_str = 'protocol' + str(self.current_protocol_index+1)
 
@@ -715,6 +718,9 @@ class Experiment():
                      cue_data=self.cue_recorder[:self.samples_counter], # TODO: make this an attribute not a dataset
                      probe_data=self.probe_recorder[:self.samples_counter],
                      chunk_data=self.chunk_recorder[:self.samples_counter])
+
+        logging.debug(
+            f"NEXT PROTOCOL SIG SAVED TIMESTAMP: {self.timestamp_recorder[self.samples_counter]}")
 
         # reset samples counter
         previous_counter = self.samples_counter
@@ -932,6 +938,9 @@ class Experiment():
             # save_h5py(self.dir_name + 'raw.h5', self.main.raw_recorder)
             # save_h5py(self.dir_name + 'signals.h5', self.main.signals_recorder)
 
+        logging.debug(
+            f"NEXT PROTOCOL END TIMESTAMP: {self.timestamp_recorder[self.samples_counter]} PROTOCOL_{self.current_protocol_index}-{self.protocols_sequence[self.current_protocol_index].name}")
+
     def restart(self):
 
         self.block_score = {}
@@ -941,7 +950,7 @@ class Experiment():
         timestamp_str = datetime.strftime(datetime.now(), '%m-%d_%H-%M-%S')
         self.dir_name = 'results/{}_{}/'.format(self.params['sExperimentName'], timestamp_str)
         os.makedirs(self.dir_name)
-        logging.basicConfig(filename=os.path.join(self.dir_name, f"{timestamp_str}.log"), level=logging.DEBUG, filemode='w')
+        logging.basicConfig(filename=os.path.join(self.dir_name, f"{timestamp_str}.log"), format='%(asctime)s> %(message)s', level=logging.DEBUG, filemode='w')
         logging.info(f"START OF SCRIPT")
         logging.info(f"results_dir: {self.dir_name}")
 

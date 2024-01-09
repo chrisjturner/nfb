@@ -39,6 +39,7 @@ class TheMainWindow(QtWidgets.QMainWindow):
 
 
     def initUI(self):
+
         # exit action
         exitAction = QtWidgets.QAction('&Exit', self)
         exitAction.setShortcut('Ctrl+Q')
